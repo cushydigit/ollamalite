@@ -79,3 +79,19 @@ type Details struct {
   QuantizationLevel string `json:"quantization_level"`
 }
 
+
+type StreamResponse struct {
+	Model       string   `json:"model"`
+	CreatedAt   string   `json:"created_at"`
+	Response    string   `json:"response"` // The actual text content
+	Done        bool     `json:"done"`
+	DoneReason  string   `json:"done_reason,omitempty"`
+	Context     []int    `json:"context,omitempty"`
+	TotalTime   int64    `json:"total_duration,omitempty"`
+	LoadTime    int64    `json:"load_duration,omitempty"`
+	EvalCount   int      `json:"eval_count,omitempty"`
+	EvalTime    int64    `json:"eval_duration,omitempty"`
+}
+
+type StreamCallBack func(StreamResponse)
+
