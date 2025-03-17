@@ -5,59 +5,62 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/shahinrahimi/ollamalite/ollama"
 )
 
-func exampleGenerate() {
+var prompts = []string{
+  "Describe humans in one words",
+  "What's the secret to infinite wealth?",
+}
+
+
+func generateCompletionExample() {
  // creating ollamalite client
   oc := ollama.NewClient("http://localhost:11434")
   // creating request
-  req := ollama.GenerateRequeset{
+  req := ollama.GenerateCompletionReq{
     Model: "llama3.2:latest",
-    Prompt: "explain interfaces in 10 most popular languages and dofferences!",
+    Prompt: prompts[0],
     Stream: false,
   }
     
   // make a single json response
-  resp, err := oc.Generate(context.TODO(), req)
+  resp, err := oc.GenerateCompletion(context.TODO(), req)
   if err != nil {
     log.Fatal(err)
   }
 
-  fmt.Printf("Response: %s", resp.Response)
+  fmt.Printf("Response: %s\n", resp.Response)
 
 }
 
 
-func exampleGenerateStream() {
+func generateCompletionStreamExample() {
    // creating ollamalite client
   oc := ollama.NewClient("http://localhost:11434")
   // creating request
-  req := ollama.GenerateRequeset{
+  req := ollama.GenerateCompletionReq{
     Model: "llama3.2:latest",
-    Prompt: "please tell best movie of alltime. just one without explanation just name.",
+    Prompt: "Describe humans in one words.",
     Stream: true,
   }
 
   // make a stream json response
-  if err := oc.GenerateStreamSSE(context.TODO(), req, func(resp ollama.StreamResponse){
-    //fmt.Println("Received response chunk: ", resp)
+  if err := oc.GenerateCompletionStream(context.TODO(), req, func(resp ollama.StreamResponse){
+    // fmt.Println("Received response chunk: ", resp)
     fmt.Print(resp.Response)
-    os.Stdout.Sync()
+    // os.Stdout.Sync()
   }); err != nil {
     log.Fatal(err)
   }
-
-  fmt.Println("\nStram ended.")
 
 }
 
 
 func main() {
-  exampleGenerateStream()
+  generateCompletionExample()
+  generateCompletionStreamExample()
   log.Fatal(errors.New("that's just happened"))
-  exampleGenerate()
 
 }

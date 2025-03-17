@@ -2,12 +2,16 @@ package ollama
 
 const (
   API = "/api"
-  GENERATE_ENDPOINT = API + "/generate"
-  GENERATE_CHAT_ENDPOINT = API + "/chat"
-  LIST_MODLES_ENDPOINT = API + ""
+  GENERATE_COMPLETION_ENDPOINT = API + "/generate"
+  GENERATE_CHAT_COMPLETION_ENDPOINT = API + "/chat"
+  CREATE_MODEL_MODEL = API + "/create"
+  LIST_LOCALS_MODLES_ENDPOINT = API + "/tags"
+  LIST_RUNNING_MODLES_ENDPOINT = API + "/ps"
+  // TODO: check /api/embed
+  GENERATE_EMBEDDING_ENDPOINT = API + "/embeddings"
 )
 
-type GenerateRequeset struct {  
+type GenerateCompletionReq struct {  
   Model string `json:"model"`
   Prompt string `json:"prompt"`   
   Stream bool `json:"stream"` 
@@ -26,7 +30,7 @@ type Options struct {
   NumCtx int `json:"num_ctx,omitempty"` 
 }
 
-type GenerateResponse struct {  
+type GenerateCompletionRes struct {  
   Model string `json:"model"`
   Response string `json:"response"`
   Done bool `json:"done"` 
@@ -38,13 +42,13 @@ type GenerateResponse struct {
   LoadDuration int64 `json:"load_duration"`
 }
 
-type GenerateChatRequest struct {
+type GenerateChatCompletionReq struct {
   Model string `json:"model"`
   Messages []Message `json:"messages"`
   Tools []string `json:"tools"` 
   Format string `json:"format"`
   Stream bool  `json:"stream"`
-  KeepAlive string `json:"keep_alive"`
+  KeepAlive int `json:"keep_alive"`
 }
 
 type Message struct {
@@ -55,15 +59,44 @@ type Message struct {
 }
 
 // TODO: add feilds
-type GenerateChatResponse struct {
+type GenerateChatCompletionRes struct {
   
 }
 
-type ListModelsResponse struct {
-  Models []Model `json:"models"`
+type LoadModelRes struct {
+  Model string `json:"model"`
+  CreatedAt string `json:"created_at"`
+  Response string `json:"response"`
+  Done bool `json:"done"`
 }
 
-type Model struct {
+type UnloadModelRes struct {
+  Model string `json:"model"`
+  CreatedAt string `json:"created_at"`
+  Response string `json:"response"`
+  Done bool `json:"done"`
+  DoneReason string `json:"done_reason"`
+}
+
+type ListRunningModelsRes struct {
+  Models []RunningModel `json:"models"` 
+}
+
+type ListLocalModelsRes struct {
+  Models []LocalModel `json:"models"`
+}
+
+type RunningModel struct {
+  Name string `json:"name"`
+  ModifiedAt string `json:"modified_at"`
+  Size int64 `json:"size"`
+  Digest string `json:"digest"` 
+  Details Details `json:"details"`
+  ExpireAt string `json:"expire_at"`
+  SizeVram int64 `json:"size_vram"`
+}
+
+type LocalModel struct {
   Name string `json:"name"`
   ModifiedAt string `json:"modified_at"`
   Size int64 `json:"size"`
@@ -74,7 +107,7 @@ type Model struct {
 type Details struct {
   Format string `json:"format"`
   Family string `json:"family"`
-  Families *string `json:"famieies"` // handle null references
+  Families []string `json:"famieies"` // handle null references
   ParamaterSize string `json:"paramater_size"`
   QuantizationLevel string `json:"quantization_level"`
 }
@@ -87,8 +120,8 @@ type StreamResponse struct {
 	Done        bool     `json:"done"`
 	DoneReason  string   `json:"done_reason,omitempty"`
 	Context     []int    `json:"context,omitempty"`
-	TotalTime   int64    `json:"total_duration,omitempty"`
-	LoadTime    int64    `json:"load_duration,omitempty"`
+	TotalDuration   int64    `json:"total_duration,omitempty"`
+	LoadDuration    int64    `json:"load_duration,omitempty"`
 	EvalCount   int      `json:"eval_count,omitempty"`
 	EvalTime    int64    `json:"eval_duration,omitempty"`
 }

@@ -1,26 +1,4 @@
 Building...
 Running...
-Reading text/Markdown stream...
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:43.964249Z","response":"\"","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:43.964249Z","response":"\"","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:43.982094Z","response":"Tok","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:43.982094Z","response":"Tok","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.000315Z","response":"yo","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.000315Z","response":"yo","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.018513Z","response":" Story","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.018513Z","response":" Story","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.036873Z","response":"\"","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.036873Z","response":"\"","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.055269Z","response":" (","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.055269Z","response":" (","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.073672Z","response":"195","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.073672Z","response":"195","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.092123Z","response":"3","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.092123Z","response":"3","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.110342Z","response":")","done":false}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.110342Z","response":")","done":false}
-Raw line: {"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.128846Z","response":"","done":true,"done_reason":"stop","context":[128006,9125,128007,271,38766,1303,33025,2696,25,6790,220,2366,18,271,128009,128006,882,128007,271,31121,3371,1888,5818,315,682,1712,13,1120,832,2085,16540,1120,836,13,128009,128006,78191,128007,271,1,53954,16417,15457,1,320,6280,18,8],"total_duration":301170709,"load_duration":33843209,"prompt_eval_count":40,"prompt_eval_duration":101718000,"eval_count":10,"eval_duration":164603000}
-{"model":"llama3.2:latest","created_at":"2025-03-16T22:28:44.128846Z","response":"","done":true,"done_reason":"stop","context":[128006,9125,128007,271,38766,1303,33025,2696,25,6790,220,2366,18,271,128009,128006,882,128007,271,31121,3371,1888,5818,315,682,1712,13,1120,832,2085,16540,1120,836,13,128009,128006,78191,128007,271,1,53954,16417,15457,1,320,6280,18,8],"total_duration":301170709,"load_duration":33843209,"prompt_eval_count":40,"prompt_eval_duration":101718000,"eval_count":10,"eval_duration":164603000}
-Stream processing finished.
-
-Stram ended.
+Response: Complex.
+Complexity.
