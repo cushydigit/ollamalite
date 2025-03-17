@@ -9,6 +9,13 @@ import (
 	"github.com/shahinrahimi/ollamalite/ollama"
 )
 
+
+type Application struct{
+  oc *ollama.Client
+}
+
+var oc = ollama.NewClient("http://localhost:11434")
+
 var prompts = []string{
   "Describe humans in one words",
   "What's the secret to infinite wealth?",
@@ -16,8 +23,6 @@ var prompts = []string{
 
 
 func generateCompletionExample() {
- // creating ollamalite client
-  oc := ollama.NewClient("http://localhost:11434")
   // creating request
   req := ollama.GenerateCompletionReq{
     Model: "llama3.2:latest",
@@ -31,14 +36,12 @@ func generateCompletionExample() {
     log.Fatal(err)
   }
 
-  fmt.Printf("Response: %s\n", resp.Response)
+  fmt.Printf("\nResponse: %s\n", resp.Response)
 
 }
 
 
 func generateCompletionStreamExample() {
-   // creating ollamalite client
-  oc := ollama.NewClient("http://localhost:11434")
   // creating request
   req := ollama.GenerateCompletionReq{
     Model: "llama3.2:latest",
@@ -47,20 +50,55 @@ func generateCompletionStreamExample() {
   }
 
   // make a stream json response
-  if err := oc.GenerateCompletionStream(context.TODO(), req, func(resp ollama.StreamResponse){
-    // fmt.Println("Received response chunk: ", resp)
+  if err := oc.GenerateCompletionSSE(context.TODO(), req, func(resp ollama.CompletionSSERes){
     fmt.Print(resp.Response)
-    // os.Stdout.Sync()
   }); err != nil {
     log.Fatal(err)
   }
 
 }
 
+func generateChatCompletionExample() {
+  req := ollama.GenerateChatCompletionReq{
+    Model: "llama3.2:latest",
+    Messages: []ollama.Message{
+      {Role: "system", Content: "You are helpfull assisstant. providing wity and dry responses."},
+      {Role: "user", Content: "Tell me an intersting space fact."},
+    },
+    Stream: false,
+  }
+
+  resp, err := oc.GenerateChatCompletion(context.TODO(), req)
+  if err != nil {
+    log.Fatal(err)
+  }
+  fmt.Printf("\n%s: %s\n", resp.Message.Role ,resp.Message.Content)
+}
+
+func generateChatCompletionStreamExample() {
+  req := ollama.GenerateChatCompletionReq{
+    Model: "llama3.2:latest",
+    Messages: []ollama.Message{
+      {Role: "system", Content: "You are helpfull assisstant. providing wity and dry responses."},
+      {Role: "user", Content: "Tell me an intersting space fact."},
+    },
+    Stream: true,
+  }
+
+  if err := oc.GenerateChatCompletionSSE(context.TODO(), req,func(sr ollama.ChatCmpletionSSERes) {
+    fmt.Print(sr.Messge.Content)
+
+  }); err != nil {
+    log.Fatal(err)
+  }
+}
+
 
 func main() {
+  generateChatCompletionStreamExample()
+  generateChatCompletionExample()
+  log.Fatal(errors.New("that's just happened"))
   generateCompletionExample()
   generateCompletionStreamExample()
-  log.Fatal(errors.New("that's just happened"))
 
 }

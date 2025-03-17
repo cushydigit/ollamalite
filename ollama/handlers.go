@@ -110,7 +110,7 @@ func (c *Client) LoadModel(ctx context.Context, modelName string) (*LoadModelRes
 }
 func (c *Client) GenerateCompletion(ctx context.Context, req GenerateCompletionReq) (*GenerateCompletionRes, error) {
   if req.Stream == true {
-    return nil, fmt.Errorf("use GenerteStreamSSE for stream enabled req")
+    return nil, fmt.Errorf("use GenerteCompletionSSE for stream enabled req")
   }
   jsonData, err := json.Marshal(req)
   if err != nil {
@@ -139,7 +139,7 @@ func (c *Client) GenerateCompletion(ctx context.Context, req GenerateCompletionR
    
 func (c *Client) GenerateChatCompletion(ctx context.Context, req GenerateChatCompletionReq) (*GenerateChatCompletionRes, error) {
   if req.Stream == true {
-    return nil, fmt.Errorf("use GenerteChatStreamSSE for stream enabled req")
+    return nil, fmt.Errorf("use GenerteChatCompletionSSE for stream enabled req")
   }
   jsonData, err := json.Marshal(req)
   if err != nil {
@@ -165,10 +165,10 @@ func (c *Client) GenerateChatCompletion(ctx context.Context, req GenerateChatCom
   return &res, nil
 
 }
-// SSE
-func (c *Client) GenerateCompletionStream(ctx context.Context, req GenerateCompletionReq, handler func(StreamResponse)) error {
+// Server-Side-Event driven
+func (c *Client) GenerateCompletionSSE(ctx context.Context, req GenerateCompletionReq, handler CompletionSSECallback) error {
   if req.Stream == false {
-    return fmt.Errorf("use Generte for stream disabled req")
+    return fmt.Errorf("use GenerteCompletion for stream disabled req")
   }
   jsonData, err := json.Marshal(req)
   if err != nil {
@@ -191,7 +191,7 @@ func (c *Client) GenerateCompletionStream(ctx context.Context, req GenerateCompl
 		line := scanner.Text()
 		// fmt.Printf("Raw JSON: %s\n", line) // Debugging line
 
-		var chunk StreamResponse
+		var chunk CompletionSSERes
 		if err := json.Unmarshal([]byte(line), &chunk); err != nil {
       fmt.Printf("Failed to parse JSON: %s\n", err)
 			continue
@@ -213,10 +213,10 @@ func (c *Client) GenerateCompletionStream(ctx context.Context, req GenerateCompl
 	return nil
 
 }
-
-func (c *Client) GenerateCompletionChatStreamSSE(ctx context.Context, req GenerateChatCompletionReq, handler func(StreamResponse)) error {
+// Server-Side-Event driven
+func (c *Client) GenerateChatCompletionSSE(ctx context.Context, req GenerateChatCompletionReq, handler ChatCompletionSSECallback ) error {
   if req.Stream == false {
-    return fmt.Errorf("use GenerteChat for stream disabled req")
+    return fmt.Errorf("use GenerteChatCompletion for stream disabled req")
   }
   jsonData, err := json.Marshal(req)
   if err != nil {
@@ -239,7 +239,7 @@ func (c *Client) GenerateCompletionChatStreamSSE(ctx context.Context, req Genera
 		line := scanner.Text()
 		// fmt.Printf("Raw JSON: %s\n", line) // Debugging line
 
-		var chunk StreamResponse
+		var chunk ChatCmpletionSSERes 
 		if err := json.Unmarshal([]byte(line), &chunk); err != nil {
 			fmt.Printf("Failed to parse JSON: %s\n", err)
 			continue

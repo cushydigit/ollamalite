@@ -60,7 +60,17 @@ type Message struct {
 
 // TODO: add feilds
 type GenerateChatCompletionRes struct {
-  
+  Model string `json:"model"`  
+  CreatedAt string `json:"create_at"`
+  Message Message `json:"message"`
+  Done bool  `json:"done"`
+  PromptEvalCount int64  `json:"prompt_eval_count"`
+  PromptEvalDuration int64 `json:"prompt_eval_duration"`
+  EvalCount int64 `json:"eval_count"`
+  EvalDuration int64 `json:"eval_duration"`
+  TotalDuration int64 `json:"total_duration"`
+  LoadDuration int64 `json:"load_duration"`
+
 }
 
 type LoadModelRes struct {
@@ -113,7 +123,7 @@ type Details struct {
 }
 
 
-type StreamResponse struct {
+type CompletionSSERes struct {
 	Model       string   `json:"model"`
 	CreatedAt   string   `json:"created_at"`
 	Response    string   `json:"response"` // The actual text content
@@ -125,6 +135,17 @@ type StreamResponse struct {
 	EvalCount   int      `json:"eval_count,omitempty"`
 	EvalTime    int64    `json:"eval_duration,omitempty"`
 }
+type ChatCmpletionSSERes struct {
+	Model       string   `json:"model"`
+	CreatedAt   string   `json:"created_at"`
+	Done        bool     `json:"done"`
+  Messge Message `json:"message"` 
+  TotalDuration   int64    `json:"total_duration,omitempty"`
+	LoadDuration    int64    `json:"load_duration,omitempty"`
+	EvalCount   int      `json:"eval_count,omitempty"`
+	EvalTime    int64    `json:"eval_duration,omitempty"`
+}
 
-type StreamCallBack func(StreamResponse)
 
+type CompletionSSECallback func(CompletionSSERes)
+type ChatCompletionSSECallback func(ChatCmpletionSSERes)
