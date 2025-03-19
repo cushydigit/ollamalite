@@ -2,7 +2,6 @@
 package ollama
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"

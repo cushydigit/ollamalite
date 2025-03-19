@@ -8,100 +8,106 @@ import (
 	"io"
 	"net/http"
 )
-// Server-Side-Event driven
-func (c *Client) GenerateCompletionSSE(ctx context.Context, req GenerateCompletionReq, handler CompletionSSECallback) error {
-  if req.Stream == false {
-    return fmt.Errorf("use GenerteCompletion for stream disabled req")
-  }
-  jsonData, err := json.Marshal(req)
-  if err != nil {
-    return fmt.Errorf("failed to marshal req: %w", err)
-  }
-  resp, err := c.makeHttpRequest(ctx, http.MethodPost, c.BaseUrl + GENERATE_COMPLETION_ENDPOINT, jsonData)
-  if err != nil {
-    return fmt.Errorf("failed to make http request: %w", err) 
-  }
-  defer resp.Body.Close()
-
-  if resp.StatusCode >= 400 {
-    body, _ := io.ReadAll(resp.Body)
-    return fmt.Errorf("HTTP error: %d - %s", resp.StatusCode, string(body))
+func (c *Client) GenerateCompletionSSE(ctx context.Context, req GenerateCompletionReq) (<-chan CompletionSSERes, <-chan  error) {
+  if !req.Stream {
+    errCh := make(chan error, 1)
+    errCh <- fmt.Errorf("use GenerteCompletion for stream disabled req")
+    return nil, errCh
   }
 
-	// Use bufio scanner to read each JSON object line by line
-	scanner := bufio.NewScanner(resp.Body)
-	for scanner.Scan() {
-		line := scanner.Text()
-		// fmt.Printf("Raw JSON: %s\n", line) // Debugging line
+  errCh := make(chan error, 1)
+  outCh := make(chan CompletionSSERes)
 
-		var chunk CompletionSSERes
-		if err := json.Unmarshal([]byte(line), &chunk); err != nil {
-      fmt.Printf("Failed to parse JSON: %s\n", err)
-			continue
-		}
+  go func ()  {
+    defer close(errCh)
+    defer close(outCh)
+    jsonData, err := json.Marshal(req)
+    if err != nil {
+      errCh <- fmt.Errorf("failed to marshal req: %w", err)
+      return 
+    }
+    resp, err := c.makeHttpRequest(ctx, http.MethodPost, c.BaseUrl + GENERATE_COMPLETION_ENDPOINT, jsonData)
+    if err != nil {
+      errCh <- fmt.Errorf("failed to make http request: %w", err)
+      return
+    }
+    defer resp.Body.Close()
 
-		// Send parsed response to callback
-		handler(chunk)
+    if resp.StatusCode >= 400 {
+      body, _ := io.ReadAll(resp.Body)
+      errCh <- fmt.Errorf("HTTP error: %d - %s", resp.StatusCode, string(body))
+      return
+    }
 
-		// Stop processing if stream is marked as done
-		if chunk.Done {
-			break
-		}
-	}
+    scanner := bufio.NewScanner(resp.Body)
+    for scanner.Scan() {
+      line := scanner.Text()
+      var chunk CompletionSSERes
+      if err := json.Unmarshal([]byte(line), &chunk); err != nil {
+        continue
+      }
+      outCh <- chunk
+      if chunk.Done {
+        break
+      }
+    }
 
-	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading stream: %w", err)
-	}
+    if err := scanner.Err(); err != nil {
+      errCh <- fmt.Errorf("error reading stream: %w", err)
+    }
 
-	return nil
+  }()
 
+  return outCh, errCh 
 }
+
 // Server-Side-Event driven
-func (c *Client) GenerateChatCompletionSSE(ctx context.Context, req GenerateChatCompletionReq, handler ChatCompletionSSECallback ) error {
-  if req.Stream == false {
-    return fmt.Errorf("use GenerteChatCompletion for stream disabled req")
-  }
-  jsonData, err := json.Marshal(req)
-  if err != nil {
-    return fmt.Errorf("failed to marshal req: %w", err)
-  }
-  resp, err := c.makeHttpRequest(ctx, http.MethodPost, c.BaseUrl + GENERATE_CHAT_COMPLETION_ENDPOINT, jsonData)
-  if err != nil {
-    return fmt.Errorf("failed to make http request: %w", err) 
-  }
-  defer resp.Body.Close()
-
-  if resp.StatusCode >= 400 {
-    body, _ := io.ReadAll(resp.Body)
-    return fmt.Errorf("HTTP error: %d - %s", resp.StatusCode, string(body))
+func (c *Client) GenerateChatCompletionSSE(ctx context.Context, req GenerateChatCompletionReq) (<-chan ChatCmpletionSSERes, <-chan error) {
+  if !req.Stream {
+    errCh := make(chan error,1)
+    errCh <- fmt.Errorf("use GenerteChatCompletion for stream disabled req")
+    close(errCh)
+    return nil, errCh
   }
 
-	// Use bufio scanner to read each JSON object line by line
-	scanner := bufio.NewScanner(resp.Body)
-	for scanner.Scan() {
-		line := scanner.Text()
-		// fmt.Printf("Raw JSON: %s\n", line) // Debugging line
+  errCh := make(chan error,1)
+  outCh := make(chan ChatCmpletionSSERes)
+  go func ()  {
+    defer close(errCh)
+    defer close(outCh)
 
-		var chunk ChatCmpletionSSERes 
-		if err := json.Unmarshal([]byte(line), &chunk); err != nil {
-			fmt.Printf("Failed to parse JSON: %s\n", err)
-			continue
-		}
+    jsonData, err := json.Marshal(req)
+    if err != nil {
+      errCh <- fmt.Errorf("failed to marshal req: %w",err)
+      return     
+    }
+    resp, err := c.makeHttpRequest(ctx, http.MethodPost, c.BaseUrl + GENERATE_CHAT_COMPLETION_ENDPOINT, jsonData)
+    if err != nil {
+      errCh <- fmt.Errorf("failed to make http request req: %w",err)
+      return     
+    }
+    defer resp.Body.Close()
+    scanner := bufio.NewScanner(resp.Body)
+    for scanner.Scan(){
+      line := scanner.Text()
+      var chunk ChatCmpletionSSERes 
+      if err := json.Unmarshal([]byte(line), &chunk); err != nil {
+        continue
+      }
+      outCh <- chunk
+      if  chunk.Done {
+        break
+      }
+    }
 
-		// Send parsed response to callback
-		handler(chunk)
+    if err := scanner.Err(); err != nil {
+      errCh <- fmt.Errorf("error reading stream: %w", err)
+      return
+    }
 
-		// Stop processing if stream is marked as done
-		if chunk.Done {
-			break
-		}
-	}
+  }()
 
-	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading stream: %w", err)
-	}
-
-	return nil
-
+  return outCh, errCh
+ 
 }
 

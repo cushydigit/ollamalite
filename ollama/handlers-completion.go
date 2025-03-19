@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 func (c *Client) GenerateCompletion(ctx context.Context, req GenerateCompletionReq) (*GenerateCompletionRes, error) {
-  if req.Stream == true {
+  if req.Stream {
     return nil, fmt.Errorf("use GenerteCompletionSSE for stream enabled req")
   }
   
@@ -38,7 +38,7 @@ func (c *Client) GenerateCompletion(ctx context.Context, req GenerateCompletionR
 }
    
 func (c *Client) GenerateChatCompletion(ctx context.Context, req GenerateChatCompletionReq) (*GenerateChatCompletionRes, error) {
-  if req.Stream == true {
+  if req.Stream {
     return nil, fmt.Errorf("use GenerteChatCompletionSSE for stream enabled req")
   }
   jsonData, err := json.Marshal(req)
