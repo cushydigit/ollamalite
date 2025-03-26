@@ -46,10 +46,11 @@ func (c *Client) GenerateCompletionSSE(ctx context.Context, req GenerateCompleti
       if err := json.Unmarshal([]byte(line), &chunk); err != nil {
         continue
       }
-      outCh <- chunk
       if chunk.Done {
+        outCh <- chunk
         break
       }
+      outCh <- chunk
     }
 
     if err := scanner.Err(); err != nil {
@@ -94,10 +95,11 @@ func (c *Client) GenerateChatCompletionSSE(ctx context.Context, req GenerateChat
       if err := json.Unmarshal([]byte(line), &chunk); err != nil {
         continue
       }
-      outCh <- chunk
-      if  chunk.Done {
+      if chunk.Done {
+        outCh <- chunk
         break
       }
+      outCh <- chunk
     }
 
     if err := scanner.Err(); err != nil {
