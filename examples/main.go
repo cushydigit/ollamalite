@@ -6,65 +6,62 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shahinrahimi/ollamalite/ollama"
+	"github.com/cushydigit/ollamalite/ollama"
 )
 
-
-type Application struct{
-  oc *ollama.Client
+type Application struct {
+	oc *ollama.Client
 }
 
 var oc = ollama.NewClient("http://localhost:11434")
 
 var prompts = []string{
-  "Describe humans in one words",
-  "What's the secret to infinite wealth?",
+	"Describe humans in one words",
+	"What's the secret to infinite wealth?",
 }
-
 
 func generateCompletionExample() {
-  // creating request
-  req := ollama.GenerateCompletionReq{
-    Model: "llama3.2:latest",
-    Prompt: prompts[0],
-    Stream: false,
-  }
-    
-  // make a single json response
-  resp, err := oc.GenerateCompletion(context.TODO(), req)
-  if err != nil {
-    log.Fatal(err)
-  }
+	// creating request
+	req := ollama.GenerateCompletionReq{
+		Model:  "llama3.2:latest",
+		Prompt: prompts[0],
+		Stream: false,
+	}
 
-  fmt.Printf("\nResponse: %s\n", resp.Response)
+	// make a single json response
+	resp, err := oc.GenerateCompletion(context.TODO(), req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("\nResponse: %s\n", resp.Response)
 
 }
 
-
 func generateCompletionStreamExample() {
-  // creating request
-  req := ollama.GenerateCompletionReq{
-    Model: "llama3.2:latest",
-    Prompt: prompts[1],
-    Stream: true,
-  }
+	// creating request
+	req := ollama.GenerateCompletionReq{
+		Model:  "llama3.2:latest",
+		Prompt: prompts[1],
+		Stream: true,
+	}
 
-  outCh, errCh := oc.GenerateCompletionSSE(context.TODO(), req)
-  for {
-    select {
-    case chunk, ok := <- outCh:
-      if !ok {
-        fmt.Printf("streamin done\n")
-        return
-      }
-      fmt.Print(chunk.Response)
-    case err, ok := <-errCh:
-      if ok {
-        fmt.Printf("Streaing error: %v", err)
-      }
-     return 
-    }
-  }
+	outCh, errCh := oc.GenerateCompletionSSE(context.TODO(), req)
+	for {
+		select {
+		case chunk, ok := <-outCh:
+			if !ok {
+				fmt.Printf("streamin done\n")
+				return
+			}
+			fmt.Print(chunk.Response)
+		case err, ok := <-errCh:
+			if ok {
+				fmt.Printf("Streaing error: %v", err)
+			}
+			return
+		}
+	}
 
 }
 
@@ -103,14 +100,13 @@ func generateCompletionStreamExample() {
 //   }
 // }
 
-
 func main() {
-  generateCompletionExample()
-  generateCompletionStreamExample()
-  //generateChatCompletionStreamExample()
-  //generateChatCompletionExample()
-  log.Fatal(errors.New("that's just happened"))
-  generateCompletionExample()
-  generateCompletionStreamExample()
+	generateCompletionExample()
+	generateCompletionStreamExample()
+	//generateChatCompletionStreamExample()
+	//generateChatCompletionExample()
+	log.Fatal(errors.New("that's just happened"))
+	generateCompletionExample()
+	generateCompletionStreamExample()
 
 }
